@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "258656413911",
-    "project_id": "socialified-23223",
-    "storage_bucket": "socialified-23223.appspot.com"
+    "project_number": "721511228214",
+    "project_id": "tatofinal",
+    "storage_bucket": "tatofinal.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:258656413911:android:bfa88e695cffd921626892",
+        "mobilesdk_app_id": "1:721511228214:android:24619d3ac267be38ddc997",
         "android_client_info": {
-          "package_name": "com.socialified"
+          "package_name": "com.tatoreal.tato"
         }
       },
       "oauth_client": [
         {
-          "client_id": "258656413911-iv8cgfsd2khapjnbpse2ef2oan4d1hjt.apps.googleusercontent.com",
+          "client_id": "721511228214-jrn8r2stqr4diskkb436mm0l4ftqjujn.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDWN8fMFHp-PFXbY9Duu0uDsXJ-_DGSI9w"
+          "current_key": "AIzaSyDiQWGTST6-9QMfLiX_J7kiaxFtpfLFvKI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "258656413911-iv8cgfsd2khapjnbpse2ef2oan4d1hjt.apps.googleusercontent.com",
+              "client_id": "721511228214-jrn8r2stqr4diskkb436mm0l4ftqjujn.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

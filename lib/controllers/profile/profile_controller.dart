@@ -335,7 +335,16 @@ class ProfileController extends GetxController {
       update();
     });
   }
+  void amigoAddRemoveUserApi({required bool isAmigo}) {
+    user.value!.isAmigo = isAmigo;
+    update();
 
+    UsersApi.addRemoveAmigoUser(
+        isAmigo: isAmigo, userId: user.value!.id)
+        .then((value) {
+      update();
+    });
+  }
   void reportUser(BuildContext context) {
     user.value!.isReported = true;
     update();

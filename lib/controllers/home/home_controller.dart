@@ -24,8 +24,9 @@ class HomeController extends GetxController {
   final UserProfileManager _userProfileManager = Get.find();
 
   RxList<PostModel> posts = <PostModel>[].obs;
-  RxList<PollsQuestionModel> polls = <PollsQuestionModel>[].obs;
+  RxList<PollsModel> polls = <PollsModel>[].obs;
   RxList<StoryModel> stories = <StoryModel>[].obs;
+  RxList<StoryModel> myStories = <StoryModel>[].obs;
   RxList<UserModel> liveUsers = <UserModel>[].obs;
   RxList<GiftModel> timelineGift = <GiftModel>[].obs;
 
@@ -37,7 +38,7 @@ class HomeController extends GetxController {
 
   RxBool isRefreshingPosts = false.obs;
   RxBool isRefreshingStories = false.obs;
-
+  RxBool isRefreshingAmigosStories = false.obs;
   RxInt categoryIndex = 0.obs;
 
   int _postsCurrentPage = 1;
@@ -196,6 +197,8 @@ class HomeController extends GetxController {
     }
   }
 
+
+
   removePostFromList(PostModel post) {
     posts.removeWhere((element) => element.id == post.id);
     posts.refresh();
@@ -219,10 +222,9 @@ class HomeController extends GetxController {
   }
 
   void postPollAnswer(
-      int pollId, int pollQuestionId, int questionOptionId) async {
+      int pollId,  int questionOptionId) async {
     MiscApi.postPollAnswer(
         pollId: pollId,
-        pollQuestionId: pollQuestionId,
         questionOptionId: questionOptionId,
         resultCallback: (result) {
           polls.addAll(result);
@@ -353,9 +355,41 @@ class HomeController extends GetxController {
   }
 
 // stories
+  void getMyStories() async {
+    isRefreshingStories.value = true;
+    update();
+
+    AppUtil.checkInternet().then((value) async {
+      if (value) {
+        var responses = await Future.wait([
+          getCurrentActiveStories()
+        ]).whenComplete(() {});
+        myStories.clear();
+
+        StoryModel story = StoryModel(
+            id: 1,
+            name: '',
+            userName: _userProfileManager.user.value!.userName,
+            email: '',
+            image: _userProfileManager.user.value!.picture,
+            media: responses[0] as List<StoryMediaModel>
+        );
+        print("My story");
+        print(story);
+        myStories.add(story);
+        //myStories.addAll(responses[1] as List<StoryModel>);
+        myStories.unique((e) => e.id);
+
+        //liveUsers.value = responses[2] as List<UserModel>;
+      }
+
+      isRefreshingStories.value = false;
+      update();
+    });
+  }
 
   void getStories() async {
-    isRefreshingStories.value = true;
+    isRefreshingAmigosStories.value = true;
     update();
 
     AppUtil.checkInternet().then((value) async {
@@ -378,14 +412,16 @@ class HomeController extends GetxController {
         stories.add(story);
         stories.addAll(responses[1] as List<StoryModel>);
         stories.unique((e) => e.id);
-
+        int val = stories.length;
         liveUsers.value = responses[2] as List<UserModel>;
       }
 
-      isRefreshingStories.value = false;
+      isRefreshingAmigosStories.value = false;
       update();
     });
   }
+
+
 
   Future<List<UserModel>> getLiveUsers() async {
     List<UserModel> currentLiveUsers = [];

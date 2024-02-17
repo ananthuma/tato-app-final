@@ -107,14 +107,21 @@ class OtherUserProfileState extends State<OtherUserProfile>
                       ],
                       backgroundColor: AppColorConstants.backgroundColor,
                       pinned: true,
-                      expandedHeight: 470.0,
+                      expandedHeight: _highlightsController.highlights.isEmpty
+                          ? 470.0
+                          : 530,
                       flexibleSpace: FlexibleSpaceBar(
-                        background: addProfileView(),
+                        background: Column(
+                          children: [addProfileView(), addHighlightsView().tP25],
+                        ),
                       ),
                     ),
                     SliverPersistentHeader(
                       delegate: _SliverAppBarDelegate(
-                        getTextTabBar(tabs: tabs, controller: controller),
+                        getTextTabBar(
+                            tabs: tabs,
+                            controller: controller,
+                            canScroll: false),
                       ),
                       pinned: true,
                       // floating: true,
@@ -124,7 +131,9 @@ class OtherUserProfileState extends State<OtherUserProfile>
                 body: TabBarView(
                   controller: controller,
                   children: [
-                    PostList(),
+                    PostList(
+                      postSource: PostSource.posts,
+                    ),
                     MentionsList(),
                   ],
                 )),
@@ -132,7 +141,7 @@ class OtherUserProfileState extends State<OtherUserProfile>
         ));
   }
 
-  addProfileView() {
+  Widget addProfileView() {
     return GetBuilder<ProfileController>(
         init: _profileController,
         builder: (ctx) {
@@ -233,65 +242,91 @@ class OtherUserProfileState extends State<OtherUserProfile>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // const Spacer(),
+        // Button to add user to close friend list
         Expanded(
           child: AppThemeButton(
-              height: 35,
-              backgroundColor: _profileController.user.value!.isFollowing
-                  ? AppColorConstants.themeColor
-                  : AppColorConstants.themeColor.lighten(0.1),
-              text: _profileController.user.value!.isFollowing
-                  ? unFollowString.tr
-                  : _profileController.user.value!.isFollower
-                      ? followBackString.tr
-                      : followString.tr.toUpperCase(),
-              onPress: () {
-                _profileController.followUnFollowUserApi(
-                    isFollowing: !_profileController.user.value!.isFollowing);
-              }),
+            height: 35,
+            backgroundColor: AppColorConstants.themeColor.lighten(0.1),
+            text:_profileController.user.value!.isAmigo ?
+                  addToCloseFriendsString.tr.toUpperCase() :
+                  removeCloseFriendsString.tr.toUpperCase(), // Adjust text as needed
+            onPress: () {
+              _profileController.amigoAddRemoveUserApi(
+                  isAmigo: !_profileController.user.value!.isAmigo);
+            },
+          ),
+        ),
+
+        // Existing follow/unfollow button
+        Expanded(
+          child: AppThemeButton(
+            height: 35,
+            backgroundColor: _profileController.user.value!.isFollowing
+                ? AppColorConstants.themeColor
+                : AppColorConstants.themeColor.lighten(0.1),
+            text: _profileController.user.value!.isFollowing
+                ? unFollowString.tr
+                : _profileController.user.value!.isFollower
+                ? followBackString.tr
+                : followString.tr.toUpperCase(),
+            onPress: () {
+              _profileController.followUnFollowUserApi(
+                  isFollowing: !_profileController.user.value!.isFollowing);
+            },
+          ),
         ),
 
         if (_settingsController.setting.value!.enableChat)
           SizedBox(
-              width: Get.width * 0.25,
-              child: AppThemeButton(
-                  height: 35,
-                  backgroundColor: AppColorConstants.cardColor.darken(0.5),
-                  text: chatString.tr,
-                  onPress: () {
-                    EasyLoading.show(status: loadingString.tr);
-                    _chatDetailController.getChatRoomWithUser(
-                        userId: _profileController.user.value!.id,
-                        callback: (room) {
-                          EasyLoading.dismiss();
-                          Get.to(() => ChatDetail(
-                                chatRoom: room,
-                              ));
-                        });
-                  })).lP8,
+            width: Get.width * 0.25,
+            child: AppThemeButton(
+              height: 35,
+              backgroundColor: AppColorConstants.cardColor.darken(0.5),
+              text: chatString.tr,
+              onPress: () {
+                EasyLoading.show(status: loadingString.tr);
+                _chatDetailController.getChatRoomWithUser(
+                  userId: _profileController.user.value!.id,
+                  callback: (room) {
+                    EasyLoading.dismiss();
+                    Get.to(() => ChatDetail(
+                      chatRoom: room,
+                    ));
+                  },
+                );
+              },
+            ),
+          ).lP8,
+
         if (_settingsController.setting.value!.enableGift)
           SizedBox(
-              width: Get.width * 0.30,
-              child: AppThemeButton(
-                  height: 35,
-                  backgroundColor: AppColorConstants.cardColor.darken(0.5),
-                  text: sendGiftString.tr,
-                  onPress: () {
-                    showModalBottomSheet<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return FractionallySizedBox(
-                              heightFactor: 0.8,
-                              child:
-                                  GiftsPageView(giftSelectedCompletion: (gift) {
-                                Get.back();
-                                _profileController.sendGift(gift);
-                              }));
-                        });
-                  })).lP8,
+            width: Get.width * 0.30,
+            child: AppThemeButton(
+              height: 35,
+              backgroundColor: AppColorConstants.cardColor.darken(0.5),
+              text: sendGiftString.tr,
+              onPress: () {
+                showModalBottomSheet<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return FractionallySizedBox(
+                      heightFactor: 0.8,
+                      child: GiftsPageView(
+                        giftSelectedCompletion: (gift) {
+                          Get.back();
+                          _profileController.sendGift(gift);
+                        },
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ).lP8,
       ],
     );
   }
+
 
   Widget statsView() {
     return Container(
@@ -396,7 +431,7 @@ class OtherUserProfileState extends State<OtherUserProfile>
             ));
   }
 
-  addHighlightsView() {
+  Widget addHighlightsView() {
     return GetBuilder<HighlightsController>(
         init: _highlightsController,
         builder: (ctx) {

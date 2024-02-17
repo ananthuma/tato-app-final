@@ -327,7 +327,7 @@ class StoryAndHighlightsShimmer extends StatelessWidget {
                 const SizedBox(
                   height: 5,
                 ),
-                const BodyLargeText('Adam')
+                const BodyLargeText('...')
               ],
             ).addShimmer();
           },

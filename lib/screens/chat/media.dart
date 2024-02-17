@@ -17,7 +17,7 @@ class Media {
   Uint8List? thumbnail;
 
   // ///The image file in bytes format
-  Uint8List? mediaByte;
+  Uint8List? mainFileBytes;
 
   ///Image Dimensions
   Size? size;
@@ -65,7 +65,7 @@ class Media {
     this.fileUrl,
 
     this.thumbnail,
-    this.mediaByte,
+    this.mainFileBytes,
     this.size,
     this.creationTime,
     this.title,

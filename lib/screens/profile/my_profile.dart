@@ -2,11 +2,14 @@ import 'package:foap/helper/imports/common_import.dart';
 import 'package:foap/screens/profile/update_profile.dart';
 import 'package:foap/screens/profile/user_post_media.dart';
 import 'package:foap/screens/settings_menu/settings.dart';
+import '../../components/highlights_bar.dart';
 import '../../components/sm_tab_bar.dart';
 import '../../controllers/post/post_controller.dart';
 import '../../controllers/story/highlights_controller.dart';
 import '../../controllers/profile/profile_controller.dart';
 import '../../model/post_search_query.dart';
+import '../highlights/choose_stories.dart';
+import '../highlights/hightlights_viewer.dart';
 import '../reuseable_widgets/post_list.dart';
 import '../settings_menu/settings_controller.dart';
 import 'follower_following_list.dart';
@@ -28,7 +31,7 @@ class MyProfileState extends State<MyProfile>
   final UserProfileManager _userProfileManager = Get.find();
   final PostController _postController = Get.find();
 
-  List<String> tabs = [postsString, mentionsString];
+  List<String> tabs = [storiesString, mentionsString];
 
   TabController? controller;
 
@@ -87,25 +90,31 @@ class MyProfileState extends State<MyProfile>
                       backgroundColor: AppColorConstants.backgroundColor,
                       pinned: true,
                       automaticallyImplyLeading: false,
-                      expandedHeight: 480.0,
+                      expandedHeight: 540.0,
                       flexibleSpace: FlexibleSpaceBar(
-                        background: addProfileView(),
+                        background: Column(
+                          children: [
+                            addProfileView(),
+                            addHighlightsView()
+
+                          ],
+                        ),
                       ),
                     ),
-                    SliverPersistentHeader(
+                    /*SliverPersistentHeader(
                       delegate: _SliverAppBarDelegate(
-                        getTextTabBar(tabs: tabs, controller: controller),
+                        getTextTabBar(tabs: tabs, controller: controller,canScroll: false),
                       ),
                       pinned: true,
                       // floating: true,
-                    )
+                    )*/
                   ];
                 },
                 body: TabBarView(
                   controller: controller,
                   children: [
-                    PostList(),
-                    MentionsList(),
+                    //PostList(postSource: PostSource.posts,),
+                    //MentionsList(),
                   ],
                 )),
           ]),
@@ -298,6 +307,27 @@ class MyProfileState extends State<MyProfile>
         Positioned(top: 0, left: 0, right: 0, child: appBar())
       ],
     );
+  }
+
+  addHighlightsView() {
+    return GetBuilder<HighlightsController>(
+        init: _highlightsController,
+        builder: (ctx) {
+          return _highlightsController.isLoading == true
+              ? const StoryAndHighlightsShimmer()
+              : HighlightsBar(
+            highlights: _highlightsController.highlights,
+            addHighlightCallback: () {
+              Get.to(() => const ChooseStoryForHighlights());
+            },
+            viewHighlightCallback: (highlight) {
+              Get.to(() => HighlightViewer(highlight: highlight))!
+                  .then((value) {
+                loadData();
+              });
+            },
+          );
+        });
   }
 
   Widget appBar() {

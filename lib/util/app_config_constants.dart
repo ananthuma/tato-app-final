@@ -7,19 +7,18 @@ final SettingsController settingsController = Get.find();
 
 class AppConfigConstants {
   // Name of app
-  static String appName = 'Socialified';
+  static String appName = 'Tato';
 
-  static String currentVersion = '2.1';
+  static String currentVersion = '2.2';
   static const liveAppLink = 'https://www.google.com/';
 
   static String appTagline = 'Share your day activity with friends';
-  static const googleMapApiKey = 'add your google map api key';
+  static const googleMapApiKey = 'AIzaSyCWsxa4LuLvSJnd7ZqHJbFoU8yUX2kxNFU';
 
-  static const restApiBaseUrl =
-      'https://product.fwdtechnology.co/socialified/api/web/v1/';
+  static const restApiBaseUrl = 'https://app.hashedcode.com/api/web/v1/';
 
   // Socket api url
-  static const socketApiBaseUrl = "https://product.fwdtechnology.co:4000/";
+  static const socketApiBaseUrl = "your_socket_api_url";
 
   // Chat encryption key -- DO NOT CHANGE THIS
   static const encryptionKey = 'bbC2H19lkVbQDfakxcrtNMQdd0FloLyw';
@@ -70,8 +69,8 @@ class AppColorConstants {
       ? Colors.white.withOpacity(0.2)
       : Colors.black.withOpacity(0.2);
 
-  static Color get inputFieldBackgroundColor =>
-      isDarkMode ? const Color(0xFF212121) : const Color(0xFF212121);
+  // static Color get inputFieldBackgroundColor =>
+  //     isDarkMode ? const Color(0xFF212121) : const Color(0xFF212121);
 
   static Color get iconColor =>
       isDarkMode ? Colors.white : const Color(0xFF212121);
@@ -79,8 +78,9 @@ class AppColorConstants {
   static Color get inputFieldTextColor =>
       isDarkMode ? const Color(0xFFFAFAFA) : const Color(0xFF212121);
 
-  static Color get inputFieldPlaceholderTextColor =>
-      isDarkMode ? const Color(0xFF3F434E) : const Color(0xFF9E9E9E);
+  static Color get inputFieldPlaceholderTextColor => isDarkMode
+      ? const Color(0xFFFAFAFA).lighten()
+      : const Color(0xFF212121).darken();
 
   static Color get red => isDarkMode ? Colors.red : Colors.red;
 

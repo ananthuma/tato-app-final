@@ -1,5 +1,6 @@
 import 'package:foap/helper/imports/chat_imports.dart';
 import 'package:foap/helper/imports/common_import.dart';
+import 'package:foap/screens/post/watch_videos.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/force_update_view.dart';
 import '../../controllers/post/select_media.dart';
@@ -42,11 +43,12 @@ class DashboardState extends State<DashboardScreen> {
     items = [
       const HomeFeedScreen(),
       const Explore(),
-      Container(),
-      const ChatHistory(),
       const MyProfile(
         showBack: false,
       ),
+      const WatchVideos(),
+      const ChatHistory(),
+
       //const Settings()
     ];
 
@@ -70,16 +72,16 @@ class DashboardState extends State<DashboardScreen> {
                     body: items[_dashboardController.currentIndex.value],
                     floatingActionButtonLocation:
                         FloatingActionButtonLocation.centerDocked,
-                    floatingActionButton: Container(
-                      height: 50,
-                      width: 50,
-                      color: AppColorConstants.themeColor,
-                      child: const ThemeIconWidget(
-                        ThemeIcon.plus,
-                        size: 28,
-                        color: Colors.white,
-                      ),
-                    ).round(20).tP16.ripple(() => {onTabTapped(2)}),
+                    // floatingActionButton: Container(
+                    //   height: 50,
+                    //   width: 50,
+                    //   color: AppColorConstants.themeColor,
+                    //   child: const ThemeIconWidget(
+                    //     ThemeIcon.plus,
+                    //     size: 28,
+                    //     color: Colors.white,
+                    //   ),
+                    // ).round(20).tP16.ripple(() => {onTabTapped(2)}),
                     bottomNavigationBar: SizedBox(
                       height: MediaQuery.of(context).viewPadding.bottom > 0
                           ? 100
@@ -133,25 +135,6 @@ class DashboardState extends State<DashboardScreen> {
                                 )),
                             label: exploreString.tr,
                           ),
-                          const BottomNavigationBarItem(
-                            icon: SizedBox(
-                              height: 30,
-                              width: 30,
-                            ),
-                            label: '',
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Obx(() => ThemeIconWidget(
-                                  ThemeIcon.chat,
-                                  size: 28,
-                                  color:
-                                      _dashboardController.currentIndex.value ==
-                                              3
-                                          ? AppColorConstants.themeColor
-                                          : AppColorConstants.iconColor,
-                                ).bP8),
-                            label: chatsString.tr,
-                          ),
                           BottomNavigationBarItem(
                             icon: Obx(() => ThemeIconWidget(
                                   ThemeIcon.account,
@@ -170,17 +153,17 @@ class DashboardState extends State<DashboardScreen> {
   }
 
   void onTabTapped(int index) async {
-    if (index == 2) {
-      Future.delayed(
-        Duration.zero,
-        () => showGeneralDialog(
-            context: context,
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const SelectMedia()),
-      );
-    } else {
-      Future.delayed(
-          Duration.zero, () => _dashboardController.indexChanged(index));
-    }
+    // if (index == 2) {
+    //   Future.delayed(
+    //     Duration.zero,
+    //     () => showGeneralDialog(
+    //         context: context,
+    //         pageBuilder: (context, animation, secondaryAnimation) =>
+    //             const SelectMedia()),
+    //   );
+    // } else {
+    Future.delayed(
+        Duration.zero, () => _dashboardController.indexChanged(index));
+    // }
   }
 }

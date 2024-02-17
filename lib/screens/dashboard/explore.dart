@@ -10,6 +10,8 @@ import '../reuseable_widgets/club_listing.dart';
 import '../reuseable_widgets/hashtags.dart';
 import '../reuseable_widgets/post_list.dart';
 import '../reuseable_widgets/users_list.dart';
+import '../story/story_viewer.dart';
+import '../story/users_updates_list.dart';
 
 class Explore extends StatefulWidget {
   const Explore({Key? key}) : super(key: key);
@@ -104,12 +106,14 @@ class _ExploreState extends State<Explore> {
                     child: Obx(() => exploreController.searchText.isNotEmpty
                         ? Column(
                             children: [
-                              SMTabBar(tabs: segments),
+                              SMTabBar(tabs: segments,canScroll: true,),
                               // segmentView(),
                               // divider(height: 0.2),
                               Expanded(
                                 child: TabBarView(children: [
-                                  PostList(),
+                                  PostList(
+                                    postSource: PostSource.posts,
+                                  ),
                                   UsersList(),
                                   HashTagsList(),
                                   ClubListing(),
@@ -117,9 +121,23 @@ class _ExploreState extends State<Explore> {
                               )
                             ],
                           )
-                        : QuickLinkWidget(
+                        : /*Obx(() =>
+                            UserStoryDisplayBar(stories: exploreController.stories,
+                              viewStoryCallback: (story)
+                              {
+                                Get.to(() => StoryViewer(
+                                  story: story,
+                                  storyDeleted: () {
+                                    exploreController.getStories();
+                                  },
+                                ));
+
+                              }
+                              )
+                            ),*/
+                           QuickLinkWidget( //removed the code because in explore page we need other statuses
                             callback: () {},
-                          )))),
+                    )))),
           ],
         )),
       ),

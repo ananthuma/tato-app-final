@@ -85,6 +85,21 @@ class UsersApi {
     });
   }
 
+  static Future<void> addRemoveAmigoUser(
+      {required bool isAmigo, required int userId}) async {
+    var url = (isAmigo
+        ? NetworkConstantsUtil.followUser
+        : NetworkConstantsUtil.unfollowUser);
+    await ApiWrapper().postApi(url: url, param: {
+      "user_id": userId.toString(),
+    }).then((result) {
+      if (result?.success == true) {
+        return;
+      }
+    });
+  }
+
+
   static Future<void> followMultipleUsers({required String userIds}) async {
     var url = NetworkConstantsUtil.followMultipleUser;
 

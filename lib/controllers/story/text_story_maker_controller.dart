@@ -43,15 +43,15 @@ class TextStoryMakerController extends GetxController {
   }
 
   postTextStory({required String text, required String backgroundColor}) {
-    StoryApi.postStory(gallery: [
-      {
-        'image': '',
-        'video': '',
-        'type': '1',
-        'description': text,
-        'background_color': backgroundColor,
-      }
-    ]);
-    Get.offAll(const DashboardScreen());
+    // StoryApi.postStory(gallery: [
+    //   {
+    //     'image': '',
+    //     'video': '',
+    //     'type': '1',
+    //     'description': text,
+    //     'background_color': backgroundColor,
+    //   }
+    // ]);
+    // Get.offAll(const DashboardScreen());
   }
 }

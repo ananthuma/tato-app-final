@@ -33,6 +33,8 @@ class UserModel {
   bool isFollowing = false;
   bool isFollower = false;
   bool isVerified = false;
+  bool isAmigo = false;
+
 
   bool isOnline = false;
   int? chatLastTimeOnline = 0;
@@ -73,6 +75,7 @@ class UserModel {
   List<UserSetting>? userSetting;
 
   GenderType? genderType;
+
 
   UserModel();
 

@@ -1,19 +1,19 @@
 import 'package:foap/helper/imports/common_import.dart';
 import 'package:foap/helper/imports/setting_imports.dart';
+import 'package:foap/screens/home_feed/story_uploader.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_polls/flutter_polls.dart';
-
 import '../../components/post_card.dart';
 import '../../controllers/post/add_post_controller.dart';
 import '../../controllers/live/agora_live_controller.dart';
 import '../../controllers/home/home_controller.dart';
+import '../../controllers/post/select_media.dart';
 import '../../model/call_model.dart';
 import '../../model/post_model.dart';
 import '../../segmentAndMenu/horizontal_menu.dart';
-import '../post/view_post_insight.dart';
-import '../story/choose_media_for_story.dart';
 import '../story/story_updates_bar.dart';
 import '../story/story_viewer.dart';
+import '../story/users_updates_list.dart';
 
 class HomeFeedScreen extends StatefulWidget {
   const HomeFeedScreen({Key? key}) : super(key: key);
@@ -84,6 +84,7 @@ class HomeFeedState extends State<HomeFeedScreen> {
     loadPosts(isRecent);
     _homeController.getPolls();
     _homeController.getStories();
+    _homeController.getMyStories();
   }
 
   @override
@@ -120,6 +121,22 @@ class HomeFeedState extends State<HomeFeedScreen> {
                     ],
                   ),
                   const Spacer(),
+                  const ThemeIconWidget(
+                    ThemeIcon.plus,
+                    size: 25,
+                  ).ripple(() {
+                    Future.delayed(
+                      Duration.zero,
+                      () => showGeneralDialog(
+                          context: context,
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const SelectMedia()),
+                    );
+                  }),
+                  const SizedBox(
+                    width: 20,
+                  ),
                   const ThemeIconWidget(
                     ThemeIcon.notification,
                     size: 25,
@@ -209,17 +226,16 @@ class HomeFeedState extends State<HomeFeedScreen> {
           init: _homeController,
           builder: (ctx) {
             return StoryUpdatesBar(
-              stories: _homeController.stories,
+              stories: _homeController.myStories,
               liveUsers: _homeController.liveUsers,
               addStoryCallback: () {
-                // Get.to(() => const TextStoryMaker());
-                Get.to(() => const ChooseMediaForStory());
+                openStoryUploader();
               },
               viewStoryCallback: (story) {
                 Get.to(() => StoryViewer(
                       story: story,
                       storyDeleted: () {
-                        _homeController.getStories();
+                        _homeController.getMyStories();
                       },
                     ));
               },
@@ -240,93 +256,109 @@ class HomeFeedState extends State<HomeFeedScreen> {
     );
   }
 
+
   postsView() {
     return Obx(() {
-      return ListView.separated(
-              controller: _controller,
-              padding: const EdgeInsets.only(bottom: 100),
-              itemCount: _homeController.posts.length + 3,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Obx(() =>
-                      _homeController.isRefreshingStories.value == true
-                          ? const StoryAndHighlightsShimmer()
-                          : storiesView());
-                } else if (index == 1) {
-                  return postingView().hp(DesignConstants.horizontalPadding);
-                } else if (index == 2) {
-                  return Obx(() => Column(
-                        children: [
-                          HorizontalMenuBar(
-                              padding: EdgeInsets.only(
-                                  left: DesignConstants.horizontalPadding,
-                                  right: DesignConstants.horizontalPadding),
-                              onSegmentChange: (segment) {
-                                _homeController.categoryIndexChanged(
-                                    index: segment,
-                                    callback: () {
-                                      _refreshController.refreshCompleted();
-                                    });
-                              },
-                              selectedIndex:
-                                  _homeController.categoryIndex.value,
-                              menus: [
-                                allString.tr,
-                                followingString.tr,
-                              ]),
-                          _homeController.isRefreshingPosts.value == true
-                              ? SizedBox(
-                                  height:
-                                      Get.height * 0.9,
-                                  child: const HomeScreenShimmer())
-                              : _homeController.posts.isEmpty
-                                  ? SizedBox(
-                                      height:
-                                          Get.height *
-                                              0.5,
-                                      child: emptyPost(
-                                          title: noPostFoundString.tr,
-                                          subTitle:
-                                              followFriendsToSeeUpdatesString
-                                                  .tr),
-                                    )
-                                  : Container()
-                        ],
-                      ));
-                } else {
-                  PostModel model = _homeController.posts[index - 3];
+      return ListView(
+        controller: _controller,
+        padding: const EdgeInsets.only(bottom: 100),
+        children: [
+          Obx(() =>
+          _homeController.isRefreshingStories.value == true
+              ? const StoryAndHighlightsShimmer()
+              : storiesView()),
+          //postingView().hp(DesignConstants.horizontalPadding),
+          _buildMenuBarSection(),//, This was causing issues for the amigos view
+          /* moved to below menu section Obx(() =>
+          _homeController.isRefreshingAmigosStories.value == true
+              ? const StoryAndHighlightsShimmer()
+              : UserStoryDisplayBar(stories: _homeController.stories,
+                                    viewStoryCallback: (story)
+                                    {
+                                        Get.to(() => StoryViewer(
+                                            story: story,
+                                            storyDeleted: () {
+                                                _homeController.getStories();
+                                            },
+                                        ));
 
-                  return PostCard(
-                    model: model,
-                    viewInsightHandler: () {
-                      Get.to(() => ViewPostInsights(post: model));
-                    },
-                    removePostHandler: () {
-                      _homeController.removePostFromList(model);
-                    },
-                    blockUserHandler: () {
-                      _homeController.removeUsersAllPostFromList(model);
-                    },
-                  );
-                }
-              },
-              separatorBuilder: (context, index) {
-                if (_settingsController.setting.value?.enablePolls == true) {
-                  return polls(index);
-                } else {
-                  return const SizedBox(
-                    height: 0,
-                  );
-                }
-              })
-          .addPullToRefresh(
-              refreshController: _refreshController,
-              enablePullUp: false,
-              enablePullDown: true,
-              onRefresh: refreshData,
-              onLoading: () {});
+                                    }
+                                    )
+          ), */
+          _buildPostCards(),
+        ],
+      ).addPullToRefresh(
+        refreshController: _refreshController,
+        enablePullUp: false,
+        enablePullDown: true,
+        onRefresh: refreshData,
+        onLoading: () {},
+      );
     });
   }
+
+  Widget _buildMenuBarSection() {
+    return Obx(() => Column(
+      children: [
+        HorizontalMenuBar(
+          padding: EdgeInsets.only(
+            left: DesignConstants.horizontalPadding,
+            right: DesignConstants.horizontalPadding,
+          ),
+          onSegmentChange: (segment) {
+            _homeController.categoryIndexChanged(
+              index: segment,
+              callback: () {
+                _refreshController.refreshCompleted();
+              },
+            );
+          },
+          selectedIndex: _homeController.categoryIndex.value,
+          menus: [
+            amigosString.tr,
+            followingString.tr,
+          ],
+        ),
+        SizedBox(
+          height: Get.height * 0.9,
+          child: Obx(() =>
+            _homeController.isRefreshingAmigosStories.value == true
+                ? const StoryAndHighlightsShimmer()
+                : UserStoryDisplayBar(stories: _homeController.stories,
+                viewStoryCallback: (story)
+                {
+                  Get.to(() => StoryViewer(
+                    story: story,
+                    storyDeleted: () {
+                      _homeController.getStories();
+                    },
+                  ));
+
+                }
+            )
+          ),
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildPostCards() {
+    return Column(
+      children: List.generate(
+        _homeController.posts.length,
+            (index) => PostCard(
+          model: _homeController.posts[index],
+          removePostHandler: () {
+            _homeController.removePostFromList(_homeController.posts[index]);
+          },
+          blockUserHandler: () {
+            _homeController.removeUsersAllPostFromList(_homeController.posts[index]);
+          },
+        ),
+      ),
+    );
+  }
+
 
   polls(int index) {
     int postIndex = index > 2 ? index - 3 : 0;
@@ -336,7 +368,7 @@ class HomeFeedState extends State<HomeFeedScreen> {
         return Container(
           color: AppColorConstants.cardColor,
           child: FlutterPolls(
-            pollId: _homeController.polls[pollIndex].pollId.toString(),
+            pollId: _homeController.polls[pollIndex].id.toString(),
             hasVoted: _homeController.polls[pollIndex].isVote! > 0,
             userVotedOptionId: _homeController.polls[pollIndex].isVote! > 0
                 ? _homeController.polls[pollIndex].isVote
@@ -344,9 +376,7 @@ class HomeFeedState extends State<HomeFeedScreen> {
             onVoted: (PollOption pollOption, int newTotalVotes) async {
               await Future.delayed(const Duration(seconds: 1));
               _homeController.postPollAnswer(
-                  _homeController.polls[pollIndex].pollId!,
-                  _homeController.polls[pollIndex].id!,
-                  pollOption.id!);
+                  _homeController.polls[pollIndex].id!, pollOption.id!);
 
               /// If HTTP status is success, return true else false
               return true;
@@ -372,7 +402,7 @@ class HomeFeedState extends State<HomeFeedScreen> {
               ),
             ),
             pollOptions: List<PollOption>.from(
-              (_homeController.polls[pollIndex].pollQuestionOption ?? []).map(
+              (_homeController.polls[pollIndex].pollOptions ?? []).map(
                 (option) {
                   var a = PollOption(
                     id: option.id,

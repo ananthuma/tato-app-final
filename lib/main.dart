@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:foap/apiHandler/apis/auth_api.dart';
+import 'package:foap/controllers/story/story_controller.dart';
 import 'package:foap/helper/imports/common_import.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:foap/controllers/live/live_users_controller.dart';
@@ -117,12 +118,16 @@ Future<void> main() async {
   Get.put(HelpSupportController());
   Get.put(PodcastStreamingController());
   Get.put(SelectUserForGroupChatController());
+  Get.put(AppStoryController());
 
   setupServiceLocator();
 
   final UserProfileManager userProfileManager = Get.find();
+  String? authKey = await SharedPrefs().getAuthorizationKey();
 
-  await userProfileManager.refreshProfile();
+  if (authKey != null) {
+    await userProfileManager.refreshProfile();
+  }
 
   final SettingsController settingsController = Get.find();
   await settingsController.getSettings();
