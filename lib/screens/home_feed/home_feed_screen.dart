@@ -325,13 +325,14 @@ class HomeFeedState extends State<HomeFeedScreen> {
             _homeController.isRefreshingAmigosStories.value == true
                 ? const StoryAndHighlightsShimmer()
                 : UserStoryDisplayBar(stories: _homeController.stories,
-                viewStoryCallback: (story)
+                viewStoryCallback: (story,index)
                 {
                   Get.to(() => StoryViewer(
                     story: story,
                     storyDeleted: () {
                       _homeController.getStories();
                     },
+                    startFromIndex: index,
                   ));
 
                 }

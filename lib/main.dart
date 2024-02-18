@@ -16,6 +16,7 @@ import 'package:foap/util/constant_util.dart';
 import 'components/giphy/src/l10n/l10n.dart';
 import 'components/reply_chat_cells/post_gift_controller.dart';
 import 'controllers/clubs/clubs_controller.dart';
+import 'controllers/misc/PublicStoriesController.dart';
 import 'controllers/misc/faq_controller.dart';
 import 'package:foap/screens/dashboard/dashboard_screen.dart';
 import 'package:foap/screens/login_sign_up/splash_screen.dart';
@@ -119,6 +120,7 @@ Future<void> main() async {
   Get.put(PodcastStreamingController());
   Get.put(SelectUserForGroupChatController());
   Get.put(AppStoryController());
+  Get.put(PublicStoriesController());
 
   setupServiceLocator();
 

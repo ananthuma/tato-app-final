@@ -11,7 +11,9 @@ class StoryViewer extends StatefulWidget {
   final StoryModel story;
   final VoidCallback storyDeleted;
 
-  const StoryViewer({Key? key, required this.story, required this.storyDeleted})
+  final int startFromIndex;
+
+  const  StoryViewer({Key? key, required this.story, required this.storyDeleted, this.startFromIndex = 0})
       : super(key: key);
 
   @override
@@ -39,55 +41,51 @@ class _StoryViewerState extends State<StoryViewer> {
   }
 
   Widget storyWidget() {
+    List<StoryMediaModel> reversedMedia = widget.story.media.toList();
     return Stack(
       children: [
         StoryView(
-            storyItems: [
-              for (StoryMediaModel media in widget.story.media.reversed)
-                media.isVideoPost() == true
-                    ? StoryItem.pageVideo(
-                        media.video!,
-                        controller: controller,
-                        duration: media.videoDuration != null
-                            ? Duration(seconds: media.videoDuration! ~/ 1000)
-                            : null,
-                        key: Key(media.id.toString()),
-                      )
-                    : StoryItem.pageImage(
-                        key: Key(media.id.toString()),
-                        url: media.image!,
-                        controller: controller,
-                      ),
-            ],
-            controller: controller,
-            // pass controller here too
-            repeat: true,
-            // should the stories be slid forever
-            onStoryShow: (s) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                storyController.setCurrentStoryMedia(widget.story.media
-                    .where(
-                        (element) => Key(element.id.toString()) == s.view.key)
-                    .first);
-              });
-            },
-            onComplete: () {
+          storyItems: [
+            for (int i = widget.startFromIndex; i < reversedMedia.length; i++)
+              reversedMedia[i].isVideoPost() == true
+                  ? StoryItem.pageVideo(
+                reversedMedia[i].video!,
+                controller: controller,
+                duration: reversedMedia[i].videoDuration != null
+                    ? Duration(seconds: reversedMedia[i].videoDuration! ~/ 1000)
+                    : null,
+                key: Key(reversedMedia[i].id.toString()),
+              )
+                  : StoryItem.pageImage(
+                key: Key(reversedMedia[i].id.toString()),
+                url: reversedMedia[i].image!,
+                controller: controller,
+              ),
+          ],
+          controller: controller,
+          repeat: true,
+          onStoryShow: (s) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              storyController.setCurrentStoryMedia(widget.story.media
+                  .where((element) => Key(element.id.toString()) == s.view.key)
+                  .first);
+            });
+          },
+          onComplete: () {
+            Get.back();
+          },
+          onVerticalSwipeComplete: (direction) {
+            if (direction == Direction.down) {
               Get.back();
-            },
-            onVerticalSwipeComplete: (direction) {
-              if (direction == Direction.down) {
-                Get.back();
-              }
-            } // To disable vertical swipe gestures, ignore this parameter.
-            // Preferrably for inline story view.
-            ),
+            }
+          },
+        ),
         Positioned(top: 70, left: 20, right: 0, child: userProfileView()),
         Obx(() => (storyController.currentStoryMediaModel.value?.userId ==
-                _userProfileManager.user.value!.id)
+            _userProfileManager.user.value!.id)
             ? Positioned(
-                bottom: 20, left: 0, right: 0, child: storyViewCounter())
+            bottom: 20, left: 0, right: 0, child: storyViewCounter())
             : Container()),
-        // Positioned(bottom: 0, left: 0, right: 0, child: replyView()),
       ],
     );
   }

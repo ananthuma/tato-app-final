@@ -5,7 +5,7 @@ import 'package:foap/helper/imports/story_imports.dart';
 
 class UserStoryDisplayBar extends StatelessWidget {
   final List<StoryModel> stories;
-  final Function(StoryModel) viewStoryCallback;
+  final Function(StoryModel, int) viewStoryCallback;
 
   const UserStoryDisplayBar({
     Key? key,
@@ -54,16 +54,18 @@ class UserStoryDisplayBar extends StatelessWidget {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: story.media.map((media) {
+                            children: story.media.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final media = entry.value;
                               return Padding(
                                 padding: EdgeInsets.only(right: 8.0),
-                                child:   MediaThumbnailView(
+                                child: MediaThumbnailView(
                                   borderColor: story.isViewed == true
                                       ? AppColorConstants.disabledColor
                                       : AppColorConstants.themeColor,
                                   media: media,
                                 ).ripple(() {
-                                  viewStoryCallback(story);
+                                  viewStoryCallback(story, index);
                                 }),
                               );
                             }).toList(),
