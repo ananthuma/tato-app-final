@@ -2,6 +2,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:foap/helper/imports/common_import.dart';
 import '../../components/search_bar.dart';
 import '../../components/sm_tab_bar.dart';
+import '../../controllers/misc/PublicStoriesController.dart';
 import '../../controllers/misc/explore_controller.dart';
 import '../../controllers/post/post_controller.dart';
 import '../../segmentAndMenu/horizontal_menu.dart';
@@ -23,6 +24,7 @@ class Explore extends StatefulWidget {
 class _ExploreState extends State<Explore> {
   final ExploreController exploreController = ExploreController();
   final PostController postController = Get.find();
+
 
   List<String> segments = [
     postsString,
@@ -121,23 +123,10 @@ class _ExploreState extends State<Explore> {
                               )
                             ],
                           )
-                        : /*Obx(() =>
-                            UserStoryDisplayBar(stories: exploreController.stories,
-                              viewStoryCallback: (story)
-                              {
-                                Get.to(() => StoryViewer(
-                                  story: story,
-                                  storyDeleted: () {
-                                    exploreController.getStories();
-                                  },
-                                ));
-
-                              }
-                              )
-                            ),*/
-                           QuickLinkWidget( //removed the code because in explore page we need other statuses
+                        : QuickLinkWidget( //removed the code because in explore page we need other's statuses
                             callback: () {},
-                    )))),
+                            )
+            ))),
           ],
         )),
       ),
@@ -158,3 +147,4 @@ class _ExploreState extends State<Explore> {
         ]);
   }
 }
+

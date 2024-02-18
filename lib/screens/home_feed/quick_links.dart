@@ -3,13 +3,18 @@ import 'package:foap/screens/add_on/ui/podcast/podcast_list_dashboard.dart';
 import 'package:foap/screens/chatgpt/chat_gpt.dart';
 import 'package:foap/screens/home_feed/story_uploader.dart';
 import 'package:foap/screens/live/live_users_screen.dart';
+import '../../components/reply_chat_cells/story_media_grid_view.dart';
 import '../../controllers/home/home_controller.dart';
+import '../../controllers/misc/PublicStoriesController.dart';
+import '../../model/story_model.dart';
 import '../chat/random_chat/choose_profile_category.dart';
 
 import '../club/clubs_listing.dart';
 import '../competitions/competitions_screen.dart';
 import '../highlights/choose_stories.dart';
 import '../live/checking_feasibility.dart';
+import '../story/story_viewer.dart';
+import '../story/users_updates_list.dart';
 import '../tvs/tv_dashboard.dart';
 
 enum QuickLinkType {
@@ -52,11 +57,15 @@ class QuickLinkWidget extends StatefulWidget {
 
 class _QuickLinkWidgetState extends State<QuickLinkWidget> {
   final HomeController _homeController = Get.find();
-
+  final PublicStoriesController _publicStoriesController = Get.find();
+  bool showStories = true;
   @override
   Widget build(BuildContext context) {
     print('_homeController.quickLinks ${_homeController.quickLinks.length}');
-    return Obx(() => GridView(
+    test(_homeController.stories);
+    return showStories == true
+        ?StoryMediaGridView(stories: _homeController.stories)
+        :GridView(
             padding: EdgeInsets.only(
                 left: DesignConstants.horizontalPadding,
                 right: DesignConstants.horizontalPadding,
@@ -119,9 +128,13 @@ class _QuickLinkWidgetState extends State<QuickLinkWidget> {
                     Get.to(() => const ChatGPT());
                   }
                 })
-            ]));
-  }
+            ]);
 
+  }
+  void test(RxList<StoryModel> stories){
+    print("storeis recieved:");
+    print(stories.length);
+  }
   Widget quickLinkView(QuickLink link) {
     return Container(
       color: AppColorConstants.cardColor,
@@ -150,3 +163,5 @@ class _QuickLinkWidgetState extends State<QuickLinkWidget> {
     ).round(20);
   }
 }
+
+
